@@ -1,27 +1,27 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import React from "react";
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import GlobalSpinner from "../../../components/common/GlobalSpinner";
 import { EditIcon, DeleteIcon } from "../../../components/common/Icons";
-import useDebounce from "../../../hooks/useDebounce";
+import Loader from "../../../components/common/Loader";
+import useSearchProducts from "../../../hooks/products/useSearchProducts";
+import { deleteProductById } from "../../../services/productService";
 
 const DeleteProductModal = ({ id }) => {
   const queryClient = useQueryClient();
+  const ref = useRef();
 
   const mutation = useMutation({
-    mutationFn: (productId) => {
-      return axios.delete(`/products/${productId}`);
-    },
+    mutationFn: (productId) => deleteProductById(productId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      ref.current.checked = false;
     },
   });
 
   return (
     <div>
-      <input type="checkbox" id={id} className="modal-toggle" />
+      <input type="checkbox" ref={ref} id={id} className="modal-toggle" />
       <label htmlFor={id} className="modal cursor-pointer">
         <label className="modal-box relative" htmlFor="">
           <div className="text-center">
@@ -48,9 +48,12 @@ const DeleteProductModal = ({ id }) => {
             <div className="flex justify-center gap-4">
               <button
                 className="btn btn-error text-white"
-                onClick={() => mutation.mutate(item.id)}
+                onClick={() => mutation.mutate(id)}
               >
-                Yes, I'm sure
+                <div className="flex items-center gap-2">
+                  {mutation.isLoading && <Loader />}
+                  <span>Yes, I'm sure</span>
+                </div>
               </button>
               <label htmlFor={id} className="btn btn-outline">
                 No, cancel
@@ -80,14 +83,7 @@ const AdminProductsAction = ({ searchString, setSearchString }) => {
 };
 
 const AdminProductsTable = ({ data, isLoading }) => {
-  //  const { data, isLoading } = useQuery({
-  //     queryKey: ["products"],
-  //     queryFn: () => {
-  //       return axios.get("/products");
-  //     },
-  //   });
-
-  const [id, setId] = useState(null)
+  const [id, setId] = useState(null);
 
   if (isLoading) return <GlobalSpinner />;
 
@@ -143,11 +139,10 @@ const AdminProductsTable = ({ data, isLoading }) => {
                     <label
                       htmlFor={item.id}
                       className="btn btn-outline btn-sm btn-square hover:opacity-80"
+                      onClick={() => setId(item.id)}
                     >
                       <DeleteIcon />
                     </label>
-
-                    {/* <button onClick={() => mutation.mutate(item.id)}></button> */}
                   </div>
                 </div>
               </th>
@@ -156,21 +151,14 @@ const AdminProductsTable = ({ data, isLoading }) => {
         </tbody>
       </table>
       {/* Modal */}
-      <DeleteProductModal id="delete-modal" />
+      <DeleteProductModal id={id} />
     </div>
   );
 };
+
 const AdminProducts = () => {
   const [searchString, setSearchString] = useState("");
-  const debouncedSearchTerm = useDebounce(searchString, 500);
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["products", { q: debouncedSearchTerm }],
-    queryFn: () => {
-      return axios.get("/products/search", { params: { q: searchString } });
-    },
-  });
-
+  const { data, isLoading } = useSearchProducts(searchString);
   return (
     <div>
       {/* Container */}

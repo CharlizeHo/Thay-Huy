@@ -1,19 +1,22 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
+// import axios from "axios";
+// import useFetch from "../../hooks/useFetch";
+// import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import useFetch from "../../hooks/useFetch";
-import { useQuery } from "@tanstack/react-query";
 import GlobalSpinner from "../../components/common/GlobalSpinner";
+import useProduct from "../../hooks/products/useProduct";
+
 
 const ProductDetail = () => {
   const { productId } = useParams();
+  const { data, isLoading } = useProduct(productId);
+
   //   const {data, isLoading} = useFetch(`products/${productId}`)
-  const { data, isLoading } = useQuery({
-    queryKey: ["products", productId],
-    queryFn: () => {
-      return axios.get(`products/${productId}`);
-    },
-  });
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ["products", productId],
+  //   queryFn: () => getProductById(productId),
+  //   // {return axios.get(`products/${productId}`)},
+  // });
 
   if (isLoading) return <GlobalSpinner />;
 
@@ -21,7 +24,7 @@ const ProductDetail = () => {
   const { data: product } = data; // === const product = data.data
 
   return (
-    <section> 
+    <section>
       {/* Container */}
       <div className="max-w-screen-xl px-4 py-8 mx-auto">
         {/* Layout */}

@@ -107,13 +107,6 @@ const Products = () => {
     },
   });
 
-  // const {} =
-  //   category != "all"
-  //     ? data.filter((item) => item.category === category)
-  //     : data;
-
-  //   if (!data) return <div>Fetching products...</div>;
-
   return (
     <div className="py-6">
       <ProductsFilter category={category} setCategory={setCategory} />

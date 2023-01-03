@@ -2,7 +2,15 @@ import FormRow from "../../../components/common/FormRow";
 import { FormRowError } from "../../../components/common/FormRowError";
 import Loader from "../../../components/common/Loader";
 
-const AdminProductForm = ({ onSubmit, register, errors, isLoading, btnLabel }) => {
+const AdminProductForm = ({
+  watch,
+  onSubmit,
+  register,
+  errors,
+  isLoading,
+  btnLabel,
+  isDirty = true,
+}) => {
   return (
     <div>
       {/* Container */}
@@ -54,15 +62,22 @@ const AdminProductForm = ({ onSubmit, register, errors, isLoading, btnLabel }) =
                 <FormRowError error={errors.price} />
               </FormRow>
 
-              {/* ImageURl */}
-              <FormRow label="Image Url" className="col-span-full">
+              {/* Image */}
+              <FormRow label="Image" className="col-span-full">
                 <input
-                  type="text"
-                  placeholder="Type here"
-                  className="input input-bordered w-full"
-                  {...register("imageUrl")}
+                  type="file"
+                  className="file-input file-input-bordered w-full"
+                  {...register("image")}
                 />
-                <FormRowError error={errors.imageUrl} />
+                {/* Preview Image */}
+                {watch("imageUrl") && (
+                  <img
+                    className="mt-4 h-[300px] w-[350px] object-contain"
+                    src={watch("imageUrl")}
+                    alt={watch("title")}
+                  />
+                )}
+                <FormRowError error={errors.image} />
               </FormRow>
 
               {/* Description */}
@@ -80,7 +95,7 @@ const AdminProductForm = ({ onSubmit, register, errors, isLoading, btnLabel }) =
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={isLoading}
+              disabled={isLoading || !isDirty}
             >
               <div className="flex items-center gap-2">
                 {isLoading && <Loader />}
