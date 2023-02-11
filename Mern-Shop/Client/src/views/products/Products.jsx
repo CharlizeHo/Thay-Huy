@@ -30,7 +30,6 @@ const ProductsFilter = ({ category, setCategory }) => {
               <option value="smartphones">Smartphones</option>
               <option value="laptops">Laptops</option>
             </select>
-            <label className="label"></label>
           </div>
         </div>
       </div>
@@ -106,7 +105,7 @@ const Products = () => {
       });
     },
   });
-
+x
   return (
     <div className="py-6">
       <ProductsFilter category={category} setCategory={setCategory} />
